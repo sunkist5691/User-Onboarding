@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
+import schema from './schema'
 import * as yup from 'yup'
 import axios from 'axios'
 
@@ -24,31 +25,6 @@ const Button = styled.button `
    width: 25%;
 
 `
-// Creating a validation format using 'Yup schema'
-const schema = yup.object().shape({
-
-   name: yup
-      .string()
-      .required('Username is required')
-      .min(5, 'Must be 5 characters or longer'), // Validate minimum characters when user wrote less than 5 characters
-
-   email: yup
-      .string()
-      .email('Must be a valid email')
-      .required('Email is required'),
-
-   password: yup
-      .string()
-      .required('Password is required')
-      .min(7, 'Must be 7 characters or longer'),
-
-   termStatus: yup
-      .boolean()
-      .oneOf([true], 'Please agree to term of use') // If it's true (checked), validation will pass, if not, the message 'Must be checked' will be pop out.
-
-})
-
-
 
 // Form Component
 const Form = ({addUserList}) => {
@@ -74,12 +50,8 @@ const Form = ({addUserList}) => {
 
    })
 
-   // Submit State
-   const [submit, setSubmit] = useState({
-
-      disabled: true
-
-   })
+   // submit button State
+   const [disabled, setDisabled] = useState(true)
 
    // Validation using 'Yup schema'
    const validation = (e, value) => {
@@ -104,10 +76,6 @@ const Form = ({addUserList}) => {
 
    }
 
-   if(error.name.length === 0 || error.email.length === 0 || error.password.length === 0 || error.password.length === 0)
-   {
-      submit.disabled = false;
-   }
 
    // Update Info state with every single character when I type going through 'validation'
    const changeHandler = (e) => {
@@ -157,7 +125,16 @@ const Form = ({addUserList}) => {
 
    }
    
- 
+   // Check if the info is passing without having any errors/ this useEffect only runs when after the rendering is finished and only if 'info' state changed and
+   useEffect(() => {
+      schema // schema is equal to 'yup.object().shape({...})'
+         .isValid(info) // check the 'info' state and go over every 'key' and value to match with 'schema' key and value if fulfilled the restriction.
+         .then((valid) => { // if the 'info' state doesn't give any errors when matching with 'schema', then returns 'true'
+         console.log(valid)
+        setDisabled(!valid); // because 'valid' returns true, we want to change the state of 'disabled' to false. 
+      });
+    }, [info]);
+
 
    // Create JSX DOM elements
    return (
@@ -220,9 +197,7 @@ const Form = ({addUserList}) => {
          </label>
 
          {/* Submit button */}
-         <Button disabled={!submit.disabled} type='submit'>Submit</Button>
-         
-         {/* disabled={submit.disabled */}
+         <Button disabled={disabled} type='submit'>Submit</Button>
 
       </WrapForm>
    )
