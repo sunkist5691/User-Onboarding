@@ -18,6 +18,7 @@ const UserList = ({user}) => {
       <WrapInfo>
          <p>{user.name}</p>
          <p>{user.email}</p>
+         <p>{user.position}</p>
       </WrapInfo>
    )
 

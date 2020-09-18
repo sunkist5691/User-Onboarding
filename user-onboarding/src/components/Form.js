@@ -36,6 +36,7 @@ const Form = ({addUserList}) => {
       name: '',
       email: '',
       password: '',
+      position: '',
       termStatus: false
 
    })
@@ -46,6 +47,7 @@ const Form = ({addUserList}) => {
       name: '',
       email: '',
       password: '',
+      position: '',
       termStatus: ''
 
    })
@@ -57,7 +59,7 @@ const Form = ({addUserList}) => {
    const validation = (e, value) => {
 
       yup
-         .reach(schema, e.target.name)
+         .reach(schema, e.target.name) // second argument is a 'path: which is 'key' in object'
          .validate(value)
          .then(valid => {
             // If there are no error, change the value of that key into empty string
@@ -67,7 +69,8 @@ const Form = ({addUserList}) => {
             })
          })
          .catch(err => {
-            // If we get error, change the value of that key into 'error.erros[0]', which is the message
+            // If we get error, 'err' returns { name: 'ValidationError, errors: ['age must be a number or somethingelse']}
+            // change the value of that key into 'error.erros[0]', which is the message
             setError({
                ...error,
                [e.target.name]: err.errors[0]
@@ -75,7 +78,6 @@ const Form = ({addUserList}) => {
          })
 
    }
-
 
    // Update Info state with every single character when I type going through 'validation'
    const changeHandler = (e) => {
@@ -116,25 +118,28 @@ const Form = ({addUserList}) => {
 
       //Resets
       setInfo({
+
          id: Date.now(),
          name: '',
          email: '',
          password: '',
+         position: '',
          termStatus: false
+
       })
 
    }
    
    // Check if the info is passing without having any errors/ this useEffect only runs when after the rendering is finished and only if 'info' state changed and
    useEffect(() => {
+
       schema // schema is equal to 'yup.object().shape({...})'
          .isValid(info) // check the 'info' state and go over every 'key' and value to match with 'schema' key and value if fulfilled the restriction.
          .then((valid) => { // if the 'info' state doesn't give any errors when matching with 'schema', then returns 'true'
-         console.log(valid)
         setDisabled(!valid); // because 'valid' returns true, we want to change the state of 'disabled' to false. 
       });
-    }, [info]);
 
+    }, [info]);
 
    // Create JSX DOM elements
    return (
@@ -194,6 +199,25 @@ const Form = ({addUserList}) => {
                onChange={changeHandler}
             />
             { error.termStatus.length > 0 ? <Error>{error.termStatus}</Error> : null /* show error message */}
+         </label>
+
+         <label htmlFor='position'>
+            What is your current position?
+            <select 
+               id='position' 
+               name='position' 
+               onChange={changeHandler} 
+               value={info.position}
+            >
+               <option value=''>---------select---------</option>
+               <option value='Jr. Developer'>Jr. Developer</option>
+               <option value='Frontend Engineer'>Frontend Engineer</option>
+               <option value='Backend Engineer'>Backend Engineer</option>
+               <option value='QA Engineer'>QA Engineer</option>
+               <option value='Dev Ops Engineer'>Dev Ops Engineer</option>
+               <option value='UX Designer'>UX Designer</option>
+               <option value='None of the options'>None of the options</option>
+            </select>
          </label>
 
          {/* Submit button */}
